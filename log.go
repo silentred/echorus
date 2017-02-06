@@ -7,6 +7,8 @@ import (
 
 	"net/http"
 
+	"runtime"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/labstack/gommon/log"
 )
@@ -188,8 +190,11 @@ func (e *Echorus) WebFields(req *http.Request) log.JSON {
 }
 
 func (e *Echorus) StaticFields() log.JSON {
+	_, file, line, _ := runtime.Caller(1)
 	return log.JSON{
 		"prefix": e.prefix,
+		"file":   file,
+		"line":   line,
 	}
 }
 

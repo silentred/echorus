@@ -17,6 +17,4 @@ func TestPrint(t *testing.T) {
 	b := log.JSON{"c": "d"}
 	c := l.MergeJSON(a, b)
 	fmt.Println(c)
-
-	l.Debugj(l.StaticFields())
 }

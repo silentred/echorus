@@ -91,80 +91,86 @@ func (e *Echorus) SetLevel(level log.Lvl) {
 }
 
 func (e *Echorus) Debug(i ...interface{}) {
-	e.logger.Debug(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Debug(i)
 }
 
 func (e *Echorus) Debugf(format string, args ...interface{}) {
-	e.logger.Debugf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Debugf(format, args)
 }
 
 func (e *Echorus) Debugj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Debug()
 }
 
 func (e *Echorus) Info(i ...interface{}) {
-	e.logger.Info(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Info(i)
 }
 
 func (e *Echorus) Infof(format string, args ...interface{}) {
-	e.logger.Infof(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Infof(format, args)
 }
 
 func (e *Echorus) Infoj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Info()
 }
 
 func (e *Echorus) Warn(i ...interface{}) {
-	e.logger.Warn(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Warn(i)
 }
 
 func (e *Echorus) Warnf(format string, args ...interface{}) {
-	e.logger.Warnf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Warnf(format, args)
 }
 
 func (e *Echorus) Warnj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Warn()
 }
 
 func (e *Echorus) Error(i ...interface{}) {
-	e.logger.Error(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Error(i)
 }
 
 func (e *Echorus) Errorf(format string, args ...interface{}) {
-	e.logger.Errorf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Errorf(format, args)
 }
 
 func (e *Echorus) Errorj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Error()
 }
 
 func (e *Echorus) Fatal(i ...interface{}) {
-	e.logger.Fatal(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Fatal(i)
 }
 
 func (e *Echorus) Fatalf(format string, args ...interface{}) {
-	e.logger.Fatalf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Fatalf(format, args)
 }
 
 func (e *Echorus) Fatalj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Fatal()
 }
 
 func (e *Echorus) Panic(i ...interface{}) {
-	e.logger.Panic(i)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Panic(i)
 }
 
 func (e *Echorus) Panicf(format string, args ...interface{}) {
-	e.logger.Panicf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Panicf(format, args)
 }
 
 func (e *Echorus) Panicj(j log.JSON) {
-	fields := logrus.Fields(j)
+	static := e.StaticFields(2)
+	fields := logrus.Fields(e.MergeJSON(j, static))
 	e.logger.WithFields(fields).Panic()
 }
 
@@ -189,8 +195,8 @@ func (e *Echorus) WebFields(req *http.Request) log.JSON {
 	}
 }
 
-func (e *Echorus) StaticFields() log.JSON {
-	_, file, line, _ := runtime.Caller(1)
+func (e *Echorus) StaticFields(skip int) log.JSON {
+	_, file, line, _ := runtime.Caller(skip)
 	return log.JSON{
 		"prefix": e.prefix,
 		"file":   file,

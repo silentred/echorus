@@ -1,12 +1,10 @@
 package echorus
 
 import (
+	"fmt"
 	"io"
-
 	"os"
-
-	"net/http"
-
+	"path/filepath"
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
@@ -16,6 +14,9 @@ import (
 var (
 	lvlToLevel map[log.Lvl]logrus.Level
 	levelToLvl map[logrus.Level]log.Lvl
+
+	TextFormat = &TextFormatter{QuoteCharacter: "`"}
+	JSONFormat = &logrus.JSONFormatter{}
 )
 
 func init() {
@@ -37,22 +38,28 @@ func init() {
 }
 
 type Echorus struct {
-	prefix string
-	logger *logrus.Logger
-	level  log.Lvl
-	output io.Writer
+	prefix    string
+	logger    *logrus.Logger
+	level     log.Lvl
+	output    io.Writer
+	shortFile bool
 }
 
 func NewLogger() *Echorus {
 	l := logrus.New()
-	l.Formatter = &logrus.JSONFormatter{}
+	l.Formatter = TextFormat
 
 	e := &Echorus{
-		logger: l,
+		logger:    l,
+		shortFile: true,
 	}
 	e.SetLevel(log.DEBUG)
 	e.SetOutput(os.Stdout)
 	return e
+}
+
+func (e *Echorus) SetFormat(fomat logrus.Formatter) {
+	e.logger.Formatter = fomat
 }
 
 func (e *Echorus) WithFields(fields logrus.Fields) *logrus.Entry {
@@ -95,7 +102,7 @@ func (e *Echorus) Debug(i ...interface{}) {
 }
 
 func (e *Echorus) Debugf(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Debugf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Debugf(format, args...)
 }
 
 func (e *Echorus) Debugj(j log.JSON) {
@@ -109,7 +116,7 @@ func (e *Echorus) Info(i ...interface{}) {
 }
 
 func (e *Echorus) Infof(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Infof(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Infof(format, args...)
 }
 
 func (e *Echorus) Infoj(j log.JSON) {
@@ -123,7 +130,7 @@ func (e *Echorus) Warn(i ...interface{}) {
 }
 
 func (e *Echorus) Warnf(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Warnf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Warnf(format, args...)
 }
 
 func (e *Echorus) Warnj(j log.JSON) {
@@ -137,7 +144,7 @@ func (e *Echorus) Error(i ...interface{}) {
 }
 
 func (e *Echorus) Errorf(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Errorf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Errorf(format, args...)
 }
 
 func (e *Echorus) Errorj(j log.JSON) {
@@ -151,7 +158,7 @@ func (e *Echorus) Fatal(i ...interface{}) {
 }
 
 func (e *Echorus) Fatalf(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Fatalf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Fatalf(format, args...)
 }
 
 func (e *Echorus) Fatalj(j log.JSON) {
@@ -165,7 +172,7 @@ func (e *Echorus) Panic(i ...interface{}) {
 }
 
 func (e *Echorus) Panicf(format string, args ...interface{}) {
-	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Panicf(format, args)
+	e.logger.WithFields(logrus.Fields(e.StaticFields(2))).Panicf(format, args...)
 }
 
 func (e *Echorus) Panicj(j log.JSON) {
@@ -179,28 +186,24 @@ func (e *Echorus) Print(i ...interface{}) {
 }
 
 func (e *Echorus) Printf(format string, args ...interface{}) {
-	e.Debugf(format, args)
+	e.Debugf(format, args...)
 }
 
 func (e *Echorus) Printj(j log.JSON) {
 	e.Debugj(j)
 }
 
-func (e *Echorus) WebFields(req *http.Request) log.JSON {
-	return log.JSON{
-		"method": req.Method,
-		"uri":    req.RequestURI,
-		"host":   req.Host,
-		"req_id": req.Header.Get("X-Request-ID"),
-	}
-}
-
 func (e *Echorus) StaticFields(skip int) log.JSON {
 	_, file, line, _ := runtime.Caller(skip)
+	if e.shortFile {
+		_, file = filepath.Split(file)
+	}
+
+	file = fmt.Sprintf("%s:%d", file, line)
+
 	return log.JSON{
 		"prefix": e.prefix,
 		"file":   file,
-		"line":   line,
 	}
 }
 

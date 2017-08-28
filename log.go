@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 )
 
 var (

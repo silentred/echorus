@@ -3,12 +3,15 @@ package echorus
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
@@ -69,7 +72,16 @@ func (f *TextFormatter) init(entry *logrus.Entry) {
 		f.QuoteCharacter = "\""
 	}
 	if entry.Logger != nil {
-		f.isTerminal = logrus.IsTerminal(entry.Logger.Out)
+		f.isTerminal = f.checkIfTerminal(entry.Logger.Out)
+	}
+}
+
+func (f *TextFormatter) checkIfTerminal(w io.Writer) bool {
+	switch v := w.(type) {
+	case *os.File:
+		return terminal.IsTerminal(int(v.Fd()))
+	default:
+		return false
 	}
 }
 

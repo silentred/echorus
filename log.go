@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/labstack/gommon/log"
+	"github.com/silentred/gid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -204,6 +205,7 @@ func (e *Echorus) StaticFields(skip int) log.JSON {
 	return log.JSON{
 		"prefix": e.prefix,
 		"file":   file,
+		"gid":    gid.Get(),
 	}
 }
 

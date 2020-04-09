@@ -7,12 +7,15 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/silentred/gid"
 	"github.com/sirupsen/logrus"
 )
 
 var (
+	_ echo.Logger = NewLogger()
+
 	lvlToLevel map[log.Lvl]logrus.Level
 	levelToLvl map[logrus.Level]log.Lvl
 
@@ -57,6 +60,10 @@ func NewLogger() *Echorus {
 	e.SetLevel(log.DEBUG)
 	e.SetOutput(os.Stdout)
 	return e
+}
+
+func (e *Echorus) SetHeader(h string) {
+	return
 }
 
 func (e *Echorus) SetFormat(fomat logrus.Formatter) {
